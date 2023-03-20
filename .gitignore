@@ -1,0 +1,23 @@
+.DS_Store
+
+**/node_modules/*
+**/npm-debug.log
+
+# User-defined NPM configuration
+.npmrc
+
+# User-defined NVM configuration
+.nvmrc
+
+# Deps
+.depsrc
+
+# JSON
+/json
+.users-imports
+.users-exports
+.validate
+
+# Environment
+.env
+!.env.default

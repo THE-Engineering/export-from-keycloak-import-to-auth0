@@ -1,0 +1,12 @@
+version: '3'
+services:
+  export-from-keycloak-import-to-auth0:
+    image: export-from-keycloak-import-to-auth0
+    container_name: export-from-keycloak-import-to-auth0
+    working_dir: /app
+    env_file: .env
+    volumes:
+      - './:/app'
+    command: >
+      sh -c "echo \"update-notifier=false\" > .npmrc && \
+      npm start"
