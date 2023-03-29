@@ -7,11 +7,8 @@ function reduceUsers (accumulator, user) {
     ] = [] // admin user does not expose `credentials`
   } = user
 
-  return (
-    credential
-      ? accumulator.concat(transformUser(user))
-      : accumulator
-  )
+  if (credential) accumulator.push(transformUser(user))
+  return accumulator
 }
 
 export default function transformUsers (users) {

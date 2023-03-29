@@ -40,7 +40,8 @@ export default function transformUser ({
       secretData,
       credentialData
     } = {}
-  ] = []
+  ] = [],
+  id
 }) {
   return {
     email,
@@ -52,6 +53,10 @@ export default function transformUser ({
       hash: {
         value: `$${getAlgorithm(credentialData)}$i=${getHashIterations(credentialData)},l=64$${getSalt(secretData)}$${getHash(secretData)}`
       }
+    },
+    user_metadata: {
+      origin: 'keycloak',
+      id
     }
   }
 }
