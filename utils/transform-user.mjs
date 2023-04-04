@@ -33,8 +33,8 @@ export function getHash (string) {
 export default function transformUser ({
   email,
   emailVerified,
-  firstName,
-  lastName,
+  firstName: givenName,
+  lastName: familyName,
   credentials: [
     {
       secretData,
@@ -46,8 +46,8 @@ export default function transformUser ({
   return {
     email,
     email_verified: emailVerified,
-    given_name: (firstName || '').trim(),
-    family_name: (lastName || '').trim(),
+    given_name: (givenName || '').trim(),
+    family_name: (familyName || '').trim(),
     custom_password_hash: {
       algorithm: 'pbkdf2',
       hash: {
