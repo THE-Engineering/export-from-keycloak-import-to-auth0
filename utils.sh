@@ -132,3 +132,23 @@ archive_files () {
     mv "$1"/*.json "$1/$archive_directory" 2> /dev/null
   fi
 }
+
+archive_file () {
+  if [ -f "$1" ];
+  then
+    D=$(dirname "$1")
+
+    current_date=$(date '+%Y-%m-%d')
+    n=1
+    archive_directory="$current_date-$n" # archive directory name
+
+    while [ -d "$D/$archive_directory" ] # while archive directory name exists
+    do
+      ((n++)) # bash compliant versus n=$((n + 1)) posix compliant increment
+      archive_directory="$current_date-$n" # archive directory name
+    done
+
+    mkdir -p "$D/$archive_directory"
+    mv "$1" "$D/$archive_directory" 2> /dev/null
+  fi
+}

@@ -41,12 +41,14 @@
     "validate-users-imports-by-users": "node ./scripts/validate-users-imports-by-users.mjs",
     "validate-users-imports-by-users-exports": "node ./scripts/validate-users-imports-by-users-exports.mjs",
     "validate-users-exports-by-users": "node ./scripts/validate-users-exports-by-users.mjs",
-    "validate-users-exports-by-users-imports": "node ./scripts/validate-users-exports-by-users-imports.mjs"
+    "validate-users-exports-by-users-imports": "node ./scripts/validate-users-exports-by-users-imports.mjs",
+    "dirs": "bash ./dirs.sh"
   },
   "dependencies": {
+    "dotenv": "^16.0.3",
     "fs-extra": "^11.1.1",
     "glob": "8.1.0",
-    "yargs-parser": "^21.1.1"
+    "nconf": "^0.12.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.21.0",

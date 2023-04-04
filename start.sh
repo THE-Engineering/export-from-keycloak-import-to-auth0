@@ -11,42 +11,43 @@ DEFAULT_AUTH0_JSON_DIRECTORY=./json/auth0
 DEFAULT_AUTH0_UPSERT=true
 DEFAULT_STATUS_JSON_DIRECTORY=./json/status
 DEFAULT_USERS_IMPORTS_JSON_DIRECTORY=.users-imports
+DEFAULT_USERS_EXPORTS_JSON_DIRECTORY=.users-exports
 
-echo '✨'
+echo ✨
 
 if ! has_auth0;
 then
   if ! has_auth0_programmatic_token;
   then
-    echo -e 1>&2 "Required environment variables must be defined (2):"; # "Required environment variables \$AUTH0_DOMAIN \$AUTH0_CONNECTION_ID \$AUTH0_ACCESS_TOKEN must be defined"
+    echo -e 1>&2 "Required environment variables must be defined (2):";
     ! has_auth0_domain && \
-      echo -e 1>&2 " \033[0;31m•\033[0m \$AUTH0_DOMAIN"
+    echo -e 1>&2 "\033[0;31m • \033[0m\$AUTH0_DOMAIN"
     ! has_auth0_connection_id && \
-      echo -e 1>&2 " \033[0;31m•\033[0m \$AUTH0_CONNECTION_ID"
+    echo -e 1>&2 "\033[0;31m • \033[0m\$AUTH0_CONNECTION_ID"
     ! has_auth0_access_token && \
-      echo -e 1>&2 " \033[0;31m•\033[0m \$AUTH0_ACCESS_TOKEN"
+    echo -e 1>&2 "\033[0;31m • \033[0m\$AUTH0_ACCESS_TOKEN"
 
-    echo '💥'
+    echo 💥
     exit 2
   fi
 
   if ! has_auth0_manual_token;
   then
-    echo -e 1>&2 "Required environment variables must be defined (3):"; # "Required environment variables \$AUTH0_DOMAIN \$AUTH0_CONNECTION_ID \$AUTH0_CLIENT_ID \$AUTH0_CLIENT_SECRET \$AUTH0_RESOURCE must be defined"
+    echo -e 1>&2 "Required environment variables must be defined (3):";
     ! has_auth0_domain && \
-      echo -e 1>&2 " \033[0;31m•\033[0m \$AUTH0_DOMAIN"
+    echo -e 1>&2 "\033[0;31m • \033[0m\$AUTH0_DOMAIN"
     ! has_auth0_connection_id && \
-      echo -e 1>&2 " \033[0;31m•\033[0m \$AUTH0_CONNECTION_ID"
+    echo -e 1>&2 "\033[0;31m • \033[0m\$AUTH0_CONNECTION_ID"
     ! has_auth0_client_id && \
-      echo -e 1>&2 " \033[0;31m•\033[0m \$AUTH0_CLIENT_ID"
+    echo -e 1>&2 "\033[0;31m • \033[0m\$AUTH0_CLIENT_ID"
     ! has_auth0_client_secret && \
-      echo -e 1>&2 " \033[0;31m•\033[0m \$AUTH0_CLIENT_SECRET"
+    echo -e 1>&2 "\033[0;31m • \033[0m\$AUTH0_CLIENT_SECRET"
     ! has_auth0_audience && \
-      echo -e 1>&2 " \033[0;31m•\033[0m \$AUTH0_AUDIENCE"
+    echo -e 1>&2 "\033[0;31m • \033[0m\$AUTH0_AUDIENCE"
     ! has_auth0_resource && \
-      echo -e 1>&2 " \033[0;31m•\033[0m \$AUTH0_RESOURCE"
+    echo -e 1>&2 "\033[0;31m • \033[0m\$AUTH0_RESOURCE"
 
-    echo '💥'
+    echo 💥
     exit 3
   fi
 fi
@@ -57,9 +58,9 @@ case $METHOD in
     then
       echo -e 1>&2 "Required environment variables must be defined (4):"; # "Required environment variables \$DOCKER_CONTAINER_NAME \$KEYCLOAK_JSON_DIRECTORY must be defined"
       ! has_docker_container_name && \
-        echo -e 1>&2 " \033[0;31m•\033[0m \$DOCKER_CONTAINER_NAME"
+      echo -e 1>&2 " \033[0;31m•\033[0m \$DOCKER_CONTAINER_NAME"
 
-      echo '💥'
+      echo 💥
       exit 4
     fi
     ;;
@@ -69,11 +70,11 @@ case $METHOD in
     then
       echo -e 1>&2 "Required environment variables must be defined (5)"; # "Required environment variables \$DOCKER_CONTAINER_NAME \$KEYCLOAK_JSON_DIRECTORY \$KEYCLOAK_REALM_NAME must be defined"
       ! has_docker_container_name && \
-        echo -e 1>&2 " \033[0;31m•\033[0m \$DOCKER_CONTAINER_NAME"
+      echo -e 1>&2 " \033[0;31m•\033[0m \$DOCKER_CONTAINER_NAME"
       ! has_keycloak_realm_name && \
-        echo -e 1>&2 " \033[0;31m•\033[0m \$KEYCLOAK_REALM_NAME"
+      echo -e 1>&2 " \033[0;31m•\033[0m \$KEYCLOAK_REALM_NAME"
 
-      echo '💥'
+      echo 💥
       exit 5
     fi
     ;;
@@ -83,15 +84,15 @@ case $METHOD in
     then
       echo -e 1>&2 "Required environment variables must be defined (6)"; # "Required environment variables \$DOCKER_CONTAINER_NAME \$KEYCLOAK_JSON_DIRECTORY must be defined"
       ! has_docker_container_name && \
-        echo -e 1>&2 " \033[0;31m•\033[0m \$DOCKER_CONTAINER_NAME"
+      echo -e 1>&2 " \033[0;31m•\033[0m \$DOCKER_CONTAINER_NAME"
 
-      echo '💥'
+      echo 💥
       exit 6
     fi
     ;;
 
   *)
-    echo '💥'
+    echo 💥
     exit 1
     ;;
 esac
@@ -100,16 +101,18 @@ mkdir \
   "${KEYCLOAK_JSON_DIRECTORY-$DEFAULT_KEYCLOAK_JSON_DIRECTORY}" \
   "${AUTH0_JSON_DIRECTORY-$DEFAULT_AUTH0_JSON_DIRECTORY}" \
   "${STATUS_JSON_DIRECTORY-$DEFAULT_STATUS_JSON_DIRECTORY}" \
-  "${USERS_IMPORTS_JSON_DIRECTORY-$DEFAULT_USERS_IMPORTS_JSON_DIRECTORY}" 2> /dev/null
+  "${USERS_IMPORTS_JSON_DIRECTORY-$DEFAULT_USERS_IMPORTS_JSON_DIRECTORY}" \
+  "${USERS_EXPORTS_JSON_DIRECTORY-$DEFAULT_USERS_EXPORTS_JSON_DIRECTORY}" 2> /dev/null
 
-echo 'Archiving files'
+echo Archiving files
 
 archive_files "${KEYCLOAK_JSON_DIRECTORY-$DEFAULT_KEYCLOAK_JSON_DIRECTORY}"
 archive_files "${AUTH0_JSON_DIRECTORY-$DEFAULT_AUTH0_JSON_DIRECTORY}"
 archive_files "${STATUS_JSON_DIRECTORY-$DEFAULT_STATUS_JSON_DIRECTORY}"
 archive_files "${USERS_IMPORTS_JSON_DIRECTORY-$DEFAULT_USERS_IMPORTS_JSON_DIRECTORY}"
+archive_files "${USERS_EXPORTS_JSON_DIRECTORY-$DEFAULT_USERS_EXPORTS_JSON_DIRECTORY}"
 
-echo 'Exporting users from Keycloak'
+echo Exporting users from Keycloak
 
 case $METHOD in
   DIFFERENT_FILES)
@@ -137,7 +140,7 @@ esac
 # shellcheck disable=SC2181
 if [[ $? == 0 ]];
 then
-  echo 'Transforming users'
+  echo Transforming users
 
   case $METHOD in
     DIFFERENT_FILES)
@@ -164,7 +167,7 @@ then
   # shellcheck disable=SC2181
   if [[ $? == 0 ]];
   then
-    echo 'Importing users to Auth0'
+    echo Importing users to Auth0
 
     NODE_OPTIONS=--no-warnings node ./scripts/users-imports.mjs \
       --AUTH0_DOMAIN "$AUTH0_DOMAIN" \
@@ -203,11 +206,11 @@ then
     # shellcheck disable=SC2181
     if [[ $? == 0 ]];
     then
-      echo '👋'
+        echo 👋
       exit 0
     fi
   fi
 fi
 
-echo '💥'
+echo 💥
 exit 1

@@ -1,9 +1,6 @@
-import yargsParser from 'yargs-parser'
+import 'dotenv/config'
+import nconf from 'nconf'
 
-const {
-  argv = []
-} = process
+export const args = nconf.argv().env().get()
 
-export const args = argv.slice(2)
-
-export default new Map(Object.entries(yargsParser(args)))
+export default new Map(Object.entries(args))

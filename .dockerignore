@@ -17,7 +17,6 @@ README.md
 
 # NPM
 .npmignore
-.npmrc
 
 # NVM
 .nvmrc
@@ -30,6 +29,10 @@ README.md
 
 # JSON
 /json
+.platform
+.users-exports
+.users-imports
+.validate
 
 # Shell
 /scripts/*.sh

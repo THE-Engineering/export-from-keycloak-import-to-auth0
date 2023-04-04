@@ -1,15 +1,31 @@
-module.exports = {
-  compact: true,
-  comments: false,
-  presets: [
-    [
-      '@babel/env', {
-        targets: {
-          node: 'current'
-        },
-        useBuiltIns: 'usage',
-        corejs: 3
-      }
-    ]
+const {
+  env: {
+    NODE_ENV = 'development'
+  }
+} = process
+
+function env () {
+  return (
+    NODE_ENV === 'production'
+  )
+}
+
+const presets = [
+  [
+    '@babel/env', {
+      targets: {
+        node: 'current'
+      },
+      useBuiltIns: 'usage',
+      corejs: 3
+    }
   ]
+]
+
+module.exports = (api) => {
+  if (api) api.cache.using(env)
+
+  return {
+    presets
+  }
 }
