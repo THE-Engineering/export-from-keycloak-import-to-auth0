@@ -16,8 +16,20 @@ import genUser from '#utils/gen-user'
 import writeToFilePath from '#utils/write-to-file-path'
 import handleError from '#utils/handle-error'
 
-function getUsers ({ users = [] }) {
-  return users
+function getUsers (fileData) {
+  if (Array.isArray(fileData)) {
+    /**
+     *  `SAME_FILE`
+     */
+    return fileData.reduce((accumulator, { users = [] }) => accumulator.concat(users), [])
+  }
+
+  if (Reflect.has(fileData, 'users')) {
+    /**
+     *  `REALM_FILE` or `DIFFERENT_FILES`
+     */
+    return Reflect.get(fileData, 'users')
+  }
 }
 
 async function app () {
