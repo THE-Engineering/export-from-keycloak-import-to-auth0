@@ -1,3 +1,5 @@
+const PATTERN = /={1,2}$/
+
 export function getAlgorithm (string) {
   const {
     algorithm
@@ -19,7 +21,7 @@ export function getSalt (string) {
     salt
   } = JSON.parse(string)
 
-  return salt.replace(/==$/, '')
+  return salt.replace(PATTERN, '')
 }
 
 export function getHash (string) {
@@ -27,7 +29,7 @@ export function getHash (string) {
     value
   } = JSON.parse(string)
 
-  return value.replace(/==$/, '')
+  return value.replace(PATTERN, '')
 }
 
 export default function transformUser ({

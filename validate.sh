@@ -6,11 +6,13 @@ set +a
 
 source ./utils.sh
 
-DEFAULT_KEYCLOAK_JSON_DIRECTORY=./json/keycloak
+# Don't get args!
+
+DEFAULT_USERS_JSON_FILE=./json/users.json
 DEFAULT_STATUS_JSON_DIRECTORY=./json/status
 DEFAULT_USERS_IMPORTS_JSON_DIRECTORY=.users-imports
 DEFAULT_USERS_EXPORTS_JSON_DIRECTORY=.users-exports
-DEFAULT_USERS_EXPORTS_JSON_FILE="${USERS_EXPORTS_JSON_DIRECTORY-$DEFAULT_USERS_EXPORTS_JSON_DIRECTORY}"/users.json
+DEFAULT_USERS_EXPORTS_JSON_FILE="${USERS_EXPORTS_JSON_DIRECTORY-$DEFAULT_USERS_EXPORTS_JSON_DIRECTORY}/users.json"
 
 USERS=false
 USERS_BY_USERS_IMPORTS=false
@@ -19,6 +21,8 @@ USERS_IMPORTS_BY_USERS_EXPORTS=false
 USERS_EXPORTS_BY_USERS_IMPORTS=false
 USERS_IMPORTS_BY_USERS=false
 USERS_EXPORTS_BY_USERS=false
+
+# Get args! Differently!
 
 while getopts "1234567" flag
 do
@@ -33,6 +37,8 @@ do
     *) exit 1;;
   esac
 done
+
+echo 🛸
 
 if
   $USERS ||
@@ -51,10 +57,12 @@ then
 
   echo Archiving files
 
-  archive_files "${STATUS_JSON_DIRECTORY-$DEFAULT_STATUS_JSON_DIRECTORY}"
-  archive_files "${USERS_IMPORTS_JSON_DIRECTORY-$DEFAULT_USERS_IMPORTS_JSON_DIRECTORY}"
-  archive_files "${USERS_EXPORTS_JSON_DIRECTORY-$DEFAULT_USERS_EXPORTS_JSON_DIRECTORY}"
-  archive_files .validate
+  archive_files "${STATUS_JSON_DIRECTORY-$DEFAULT_STATUS_JSON_DIRECTORY}";
+  archive_files "${USERS_IMPORTS_JSON_DIRECTORY-$DEFAULT_USERS_IMPORTS_JSON_DIRECTORY}";
+  archive_files "${USERS_EXPORTS_JSON_DIRECTORY-$DEFAULT_USERS_EXPORTS_JSON_DIRECTORY}";
+  archive_files .validate;
+
+  users;
 
   if
     $USERS_BY_USERS_IMPORTS ||
@@ -66,136 +74,55 @@ then
   then
     echo Exporting users from Auth0
 
-    NODE_OPTIONS=--no-warnings node ./scripts/users-exports.mjs \
-      --AUTH0_DOMAIN "$AUTH0_DOMAIN" \
-      --AUTH0_CONNECTION_ID "$AUTH0_CONNECTION_ID" \
-      --AUTH0_CLIENT_ID "$AUTH0_CLIENT_ID" \
-      --AUTH0_CLIENT_SECRET "$AUTH0_CLIENT_SECRET" \
-      --AUTH0_AUDIENCE "$AUTH0_AUDIENCE" \
-      --AUTH0_RESOURCE "$AUTH0_RESOURCE" \
-      --USERS_EXPORTS_PATH "${USERS_EXPORTS_JSON_FILE-$DEFAULT_USERS_EXPORTS_JSON_FILE}" \
-      --DESTINATION "${STATUS_JSON_DIRECTORY-$DEFAULT_STATUS_JSON_DIRECTORY}"
+    users_exports;
 
     # shellcheck disable=SC2181
     if [[ $? == 0 ]];
     then
-      if [[ ! -f "$DEFAULT_USERS_EXPORTS_JSON_FILE" ]];
+      if [[ ! -f "${USERS_EXPORTS_JSON_FILE-$DEFAULT_USERS_EXPORTS_JSON_FILE}" ]];
       then
         # shellcheck disable=SC2016
-        echo 'Run `./users-exports.sh`'
+        echo Run "./users-exports.sh"
         exit 1
       fi
     fi
   fi
 
-  if [[ $METHOD == 'DIFFERENT_FILES' ]];
+  if $USERS;
   then
-    if $USERS;
-    then
-      echo -e 'Validating users \033[0;90m1\033[0m' # 1
+    echo -e "Validating users \033[0;90m1\033[0m" # 1
 
-      # 1. Structure
-      node ./scripts/different-files/validate-users.mjs \
-        --ORIGIN "${KEYCLOAK_JSON_DIRECTORY-$DEFAULT_KEYCLOAK_JSON_DIRECTORY}" \
-        --DESTINATION .validate/users.json
-    fi
-
-    if $USERS_BY_USERS_IMPORTS;
-    then
-      echo -e 'Validating users by users imports \033[0;90m2\033[0m' # 2
-
-      # 2. Users not in users imports (not dispatched to Auth0)
-      node ./scripts/different-files/validate-users-by-users-imports.mjs \
-        --ORIGIN "${KEYCLOAK_JSON_DIRECTORY-$DEFAULT_KEYCLOAK_JSON_DIRECTORY}" \
-        --USERS_IMPORTS_PATH "${USERS_IMPORTS_JSON_DIRECTORY-$DEFAULT_USERS_IMPORTS_JSON_DIRECTORY}" \
-        --DESTINATION .validate/users-by-users-imports.json
-    fi
-
-    if $USERS_BY_USERS_EXPORTS;
-    then
-      echo -e 'Validating users by users exports \033[0;90m3\033[0m' # 3
-
-      # 3. Users not in users exports (not retrieved from Auth0. Exceptions)
-      node ./scripts/different-files/validate-users-by-users-exports.mjs \
-        --ORIGIN "${KEYCLOAK_JSON_DIRECTORY-$DEFAULT_KEYCLOAK_JSON_DIRECTORY}" \
-        --USERS_EXPORTS_PATH "${USERS_EXPORTS_JSON_FILE-$DEFAULT_USERS_EXPORTS_JSON_FILE}" \
-        --DESTINATION .validate/users-by-users-exports.json
-    fi
+    # 1. Structure
+    node ./scripts/validate-users.mjs \
+      --ORIGIN "${USERS_JSON_FILE-$DEFAULT_USERS_JSON_FILE}" \
+      --DESTINATION .validate/users.json
   fi
 
-  if [[ $METHOD == 'REALM_FILE' ]];
+  if $USERS_BY_USERS_IMPORTS;
   then
-    if $USERS;
-    then
-      echo -e 'Validating users \033[0;90m1\033[0m' # 1
+    echo -e "Validating users by users imports \033[0;90m2\033[0m" # 2
 
-      # 1. Structure
-      node ./scripts/realm-file/validate-users.mjs \
-        --ORIGIN "${KEYCLOAK_JSON_DIRECTORY-$DEFAULT_KEYCLOAK_JSON_DIRECTORY}" \
-        --DESTINATION .validate/users.json
-    fi
-
-    if $USERS_BY_USERS_IMPORTS;
-    then
-      echo -e 'Validating users by users imports \033[0;90m2\033[0m' # 2
-
-      # 2. Users not in users imports (not dispatched to Auth0)
-      node ./scripts/realm-file/validate-users-by-users-imports.mjs \
-        --ORIGIN "${KEYCLOAK_JSON_DIRECTORY-$DEFAULT_KEYCLOAK_JSON_DIRECTORY}" \
-        --USERS_IMPORTS_PATH "${USERS_IMPORTS_JSON_DIRECTORY-$DEFAULT_USERS_IMPORTS_JSON_DIRECTORY}" \
-        --DESTINATION .validate/users-by-users-imports.json
-    fi
-
-    if $USERS_BY_USERS_EXPORTS;
-    then
-      echo -e 'Validating users by users exports \033[0;90m3\033[0m' # 3
-
-      # 3. Users not in users exports (not retrieved from Auth0. Exceptions)
-      node ./scripts/realm-file/validate-users-by-users-exports.mjs \
-        --ORIGIN "${KEYCLOAK_JSON_DIRECTORY-$DEFAULT_KEYCLOAK_JSON_DIRECTORY}" \
-        --USERS_EXPORTS_PATH "${USERS_EXPORTS_JSON_FILE-$DEFAULT_USERS_EXPORTS_JSON_FILE}" \
-        --DESTINATION .validate/users-by-users-exports.json
-    fi
+    # 2. Users not in users imports (not dispatched to Auth0)
+    node ./scripts/validate-users-by-users-imports.mjs \
+      --ORIGIN "${USERS_JSON_FILE-$DEFAULT_USERS_JSON_FILE}" \
+      --USERS_IMPORTS_PATH "${USERS_IMPORTS_JSON_DIRECTORY-$DEFAULT_USERS_IMPORTS_JSON_DIRECTORY}" \
+      --DESTINATION .validate/users-by-users-imports.json
   fi
 
-  if [[ $METHOD == 'SAME_FILE' ]];
+  if $USERS_BY_USERS_EXPORTS;
   then
-    if $USERS;
-    then
-      echo -e 'Validating users \033[0;90m1\033[0m' # 1
+    echo -e "Validating users by users exports \033[0;90m3\033[0m" # 3
 
-      # 1. Structure
-      node ./scripts/same-file/validate-users.mjs \
-        --ORIGIN "${KEYCLOAK_JSON_DIRECTORY-$DEFAULT_KEYCLOAK_JSON_DIRECTORY}" \
-        --DESTINATION .validate/users.json
-    fi
-
-    if $USERS_BY_USERS_IMPORTS;
-    then
-      echo -e 'Validating users by users imports \033[0;90m2\033[0m' # 2
-
-      # 2. Users not in users imports (not dispatched to Auth0)
-      node ./scripts/same-file/validate-users-by-users-imports.mjs \
-        --ORIGIN "${KEYCLOAK_JSON_DIRECTORY-$DEFAULT_KEYCLOAK_JSON_DIRECTORY}" \
-        --USERS_IMPORTS_PATH "${USERS_IMPORTS_JSON_DIRECTORY-$DEFAULT_USERS_IMPORTS_JSON_DIRECTORY}" \
-        --DESTINATION .validate/users-by-users-imports.json
-    fi
-
-    if $USERS_BY_USERS_EXPORTS;
-    then
-      echo -e 'Validating users by users exports \033[0;90m3\033[0m' # 3
-
-      # 3. Users not in users exports (not retrieved from Auth0. Exceptions)
-      node ./scripts/same-file/validate-users-by-users-exports.mjs \
-        --ORIGIN "${KEYCLOAK_JSON_DIRECTORY-$DEFAULT_KEYCLOAK_JSON_DIRECTORY}" \
-        --USERS_EXPORTS_PATH "${USERS_EXPORTS_JSON_FILE-$DEFAULT_USERS_EXPORTS_JSON_FILE}" \
-        --DESTINATION .validate/users-by-users-exports.json
-    fi
+    # 3. Users not in users exports (not retrieved from Auth0. Exceptions)
+    node ./scripts/validate-users-by-users-exports.mjs \
+      --ORIGIN "${USERS_JSON_FILE-$DEFAULT_USERS_JSON_FILE}" \
+      --USERS_EXPORTS_PATH "${USERS_EXPORTS_JSON_FILE-$DEFAULT_USERS_EXPORTS_JSON_FILE}" \
+      --DESTINATION .validate/users-by-users-exports.json
   fi
 
   if $USERS_IMPORTS_BY_USERS_EXPORTS;
   then
-    echo -e 'Validating users imports by users exports \033[0;90m4\033[0m' # 4
+    echo -e "Validating users imports by users exports \033[0;90m4\033[0m" # 4
 
     # 4. Users in users imports but not in users exports (dispatched to Auth0 but not retrieved from Auth0)
     node ./scripts/validate-users-imports-by-users-exports.mjs \
@@ -206,7 +133,7 @@ then
 
   if $USERS_EXPORTS_BY_USERS_IMPORTS;
   then
-    echo -e 'Validating users exports by users imports \033[0;90m5\033[0m' # 5
+    echo -e "Validating users exports by users imports \033[0;90m5\033[0m" # 5
 
     # 5. Users in users exports but not in users imports (retrieved from Auth0 but not Keycloak users)
     node ./scripts/validate-users-exports-by-users-imports.mjs \
@@ -215,84 +142,51 @@ then
       --DESTINATION .validate/users-exports-by-users-imports.json
   fi
 
-  if [[ $METHOD == 'DIFFERENT_FILES' ]];
+  if $USERS_IMPORTS_BY_USERS;
   then
-    if $USERS_IMPORTS_BY_USERS;
-    then
-      echo -e 'Validating users imports by users \033[0;90m6\033[0m' # 6
+    echo -e "Validating users imports by users \033[0;90m6\033[0m" # 6
 
-      # 6. Users in users imports but not in users (This should be impossible)
-      node ./scripts/different-files/validate-users-imports-by-users.mjs \
-        --ORIGIN "${USERS_IMPORTS_JSON_DIRECTORY-$DEFAULT_USERS_IMPORTS_JSON_DIRECTORY}" \
-        --KEYCLOAK_PATH "${KEYCLOAK_JSON_DIRECTORY-$DEFAULT_KEYCLOAK_JSON_DIRECTORY}" \
-        --DESTINATION .validate/users-imports-by-users.json
-    fi
-
-    if $USERS_EXPORTS_BY_USERS;
-    then
-      echo -e 'Validating users exports by users \033[0;90m7\033[0m' # 7
-
-      # 7. Users in users exports but not in users (retrieved from Auth0 but not Keycloak users)
-      node ./scripts/different-files/validate-users-exports-by-users.mjs \
-        --ORIGIN "${USERS_EXPORTS_JSON_FILE-$DEFAULT_USERS_EXPORTS_JSON_FILE}" \
-        --KEYCLOAK_PATH "${KEYCLOAK_JSON_DIRECTORY-$DEFAULT_KEYCLOAK_JSON_DIRECTORY}" \
-        --DESTINATION .validate/users-exports-by-users.json
-    fi
+    # 6. Users in users imports but not in users (This should be impossible)
+    node ./scripts/validate-users-imports-by-users.mjs \
+      --ORIGIN "${USERS_IMPORTS_JSON_DIRECTORY-$DEFAULT_USERS_IMPORTS_JSON_DIRECTORY}" \
+      --USERS_PATH "${USERS_JSON_FILE-$DEFAULT_USERS_JSON_FILE}" \
+      --DESTINATION .validate/users-imports-by-users.json
   fi
 
-  if [[ $METHOD == 'REALM_FILE' ]];
+  if $USERS_EXPORTS_BY_USERS;
   then
-    if $USERS_IMPORTS_BY_USERS;
-    then
-      echo -e 'Validating users imports by users \033[0;90m6\033[0m' # 6
+    echo -e "Validating users exports by users \033[0;90m7\033[0m" # 7
 
-      # 6. Users in users imports but not in users (This should be impossible)
-      node ./scripts/realm-file/validate-users-imports-by-users.mjs \
-        --ORIGIN "${USERS_IMPORTS_JSON_DIRECTORY-$DEFAULT_USERS_IMPORTS_JSON_DIRECTORY}" \
-        --KEYCLOAK_PATH "${KEYCLOAK_JSON_DIRECTORY-$DEFAULT_KEYCLOAK_JSON_DIRECTORY}" \
-        --DESTINATION .validate/users-imports-by-users.json
-    fi
-
-    if $USERS_EXPORTS_BY_USERS;
-    then
-      echo -e 'Validating users exports by users \033[0;90m7\033[0m' # 7
-
-      # 7. Users in users exports but not in users (retrieved from Auth0 but not Keycloak users)
-      node ./scripts/realm-file/validate-users-exports-by-users.mjs \
-        --ORIGIN "${USERS_EXPORTS_JSON_FILE-$DEFAULT_USERS_EXPORTS_JSON_FILE}" \
-        --KEYCLOAK_PATH "${KEYCLOAK_JSON_DIRECTORY-$DEFAULT_KEYCLOAK_JSON_DIRECTORY}" \
-        --DESTINATION .validate/users-exports-by-users.json
-    fi
-  fi
-
-  if [[ $METHOD == 'SAME_FILE' ]];
-  then
-    if $USERS_IMPORTS_BY_USERS;
-    then
-      echo -e 'Validating users imports by users \033[0;90m6\033[0m' # 6
-
-      # 6. Users in users imports but not in users (This should be impossible)
-      node ./scripts/same-file/validate-users-imports-by-users.mjs \
-        --ORIGIN "${USERS_IMPORTS_JSON_DIRECTORY-$DEFAULT_USERS_IMPORTS_JSON_DIRECTORY}" \
-        --KEYCLOAK_PATH "${KEYCLOAK_JSON_DIRECTORY-$DEFAULT_KEYCLOAK_JSON_DIRECTORY}" \
-        --DESTINATION .validate/users-imports-by-users.json
-    fi
-
-    if $USERS_EXPORTS_BY_USERS;
-    then
-      echo -e 'Validating users exports by users \033[0;90m7\033[0m' # 7
-
-      # 7. Users in users exports but not in users (retrieved from Auth0 but not UMS users)
-      node ./scripts/same-file/validate-users-exports-by-users.mjs \
-        --ORIGIN "${USERS_EXPORTS_JSON_FILE-$DEFAULT_USERS_EXPORTS_JSON_FILE}" \
-        --KEYCLOAK_PATH "${KEYCLOAK_JSON_DIRECTORY-$DEFAULT_KEYCLOAK_JSON_DIRECTORY}" \
-        --DESTINATION .validate/users-exports-by-users.json
-    fi
+    # 7. Users in users exports but not in users (retrieved from Auth0 but not Keycloak users)
+    node ./scripts/validate-users-exports-by-users.mjs \
+      --ORIGIN "${USERS_EXPORTS_JSON_FILE-$DEFAULT_USERS_EXPORTS_JSON_FILE}" \
+      --USERS_PATH "${USERS_JSON_FILE-$DEFAULT_USERS_JSON_FILE}" \
+      --DESTINATION .validate/users-exports-by-users.json
   fi
 
   # shellcheck disable=SC2181
   if [[ $? == 0 ]];
   then
+    if has_git_lfs;
+    then
+      # Git LFS is configured
+
+      bash ./git-lfs.sh "$PWD"
+    else
+      # Git LFS or Git is not configured
+
+      ! has_git_user_id && \
+      echo -e " \033[0;33m•\033[0m No \033[0;93m\$GIT_USER_ID\033[0m"
+      ! has_git_user_name && \
+      echo -e " \033[0;33m•\033[0m No \033[0;93m\$GIT_USER_NAME\033[0m"
+      ! has_git_user_email && \
+      echo -e " \033[0;33m•\033[0m No \033[0;93m\$GIT_USER_EMAIL\033[0m"
+      ! has_git_lfs_personal_access_token && \
+      echo -e " \033[0;33m•\033[0m No \033[0;93m\$GIT_LFS_PERSONAL_ACCESS_TOKEN\033[0m"
+      ! has_git_lfs_repo && \
+      echo -e " \033[0;33m•\033[0m No \033[0;93m\$GIT_LFS_REPOSITORY\033[0m"
+    fi
+
     echo 👋
     exit 0
   fi

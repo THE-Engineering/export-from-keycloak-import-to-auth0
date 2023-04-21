@@ -20,15 +20,9 @@
     "start": "bash ./start.sh",
     "lint": "cross-env NODE_ENV=production eslint . --ext .mjs --ext .cjs",
     "lint:fix": "npm run lint -- --fix",
-    "different-files:export": "node ./scripts/different-files/export.mjs",
-    "different-files:export-with-file": "node ./scripts/different-files/export-with-file.mjs",
-    "different-files:transform": "node ./scripts/different-files/transform.mjs",
-    "realm-file:export": "node ./scripts/realm-file/export.mjs",
-    "realm-file:export-with-file": "node ./scripts/realm-file/export-with-file.mjs",
-    "realm-file:transform": "node ./scripts/realm-file/transform.mjs",
-    "same-file:export": "node ./scripts/same-file/export.mjs",
-    "same-file:export-with-file": "node ./scripts/same-file/export-with-file.mjs",
-    "same-file:transform": "node ./scripts/same-file/transform.mjs",
+    "users": "node ./scripts/users.mjs",
+    "transform": "bash ./transform.sh",
+    "transform-users": "node ./scripts/transform-users.mjs",
     "users-imports": "node ./scripts/users-imports.mjs",
     "users-exports": "node ./scripts/users-exports.mjs",
     "remove-by-users": "node ./scripts/remove-by-users.mjs",
@@ -57,15 +51,17 @@
     "@babel/preset-env": "^7.21.4",
     "core-js": "^3.30.0",
     "cross-env": "^7.0.3",
-    "eslint": "^8.37.0",
+    "eslint": "^8.38.0",
     "eslint-config-standard": "^17.0.0",
     "eslint-plugin-import": "^2.27.5",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^6.1.1"
   },
   "imports": {
+    "#config": "./config/index.mjs",
     "#config/*": "./config/*.mjs",
     "#utils/*": "./utils/*.mjs",
+    "#utils/crypto": "./utils/crypto/index.mjs",
     "#application/*": "./application/*.mjs"
   }
 }

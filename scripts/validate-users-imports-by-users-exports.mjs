@@ -17,10 +17,10 @@ import writeToFilePath from '#utils/write-to-file-path'
 import hasUserEmail from '#utils/has-user-email'
 import getUserEmail from '#utils/get-user-email'
 import validate from '#utils/validate-users-imports'
-import sortByUserId from '#utils/sort-by-user-id'
+import sortById from '#utils/sort-by-id'
 import handleError from '#utils/handle-error'
 
-function toSet (usersExports) {
+function toSet (usersExports = []) {
   return (
     new Set(
       usersExports
@@ -49,16 +49,16 @@ async function app () {
   console.log('🚀')
 
   try {
-    const usersImports = await getUsersImports(ORIGIN)
+    const usersImports = await getUsersImports(ORIGIN) ?? []
     const usersExports = await getUsersExports(USERS_EXPORTS_PATH)
-    await writeToFilePath(DESTINATION, usersImports.reduce(getReduce(toSet(usersExports)), []).sort(sortByUserId))
-
-    console.log('👍')
+    await writeToFilePath(DESTINATION, usersImports.reduce(getReduce(toSet(usersExports)), []).sort(sortById))
   } catch (e) {
     handleError(e)
 
     process.exit(1)
   }
+
+  console.log('👍')
 }
 
 export default app()

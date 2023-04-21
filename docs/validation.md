@@ -3,6 +3,12 @@
 
 Validation produces a set of JSON files. All except one of those files is a _diff_ between other JSON files
 
+_All data managed by this application_ is encrypted and must be decrypted for use
+
+You can decrypt JSON files at the command line in your development environment using [@sequencemedia/crypto](https://github.com/sequencemedia/crypto)[^1]
+
+## Parameters
+
 - _Users_ `1` validates fields and values in the Keycloak users source
 - _Users by users imports_ `2` is a diff of the Keycloak users and the users dispatched to Auth0
 - _Users by users exports_ `3` is a diff of the Keycloak users and the users retrieved from Auth0
@@ -41,13 +47,13 @@ To generate any of the JSON files you should set the corresponding numeric optio
 Assuming options `1`, `3`, and `7`, either
 
 ```bash
-npm run validation -- -137
+npm run validate -- -137
 ```
 
 Or
 
 ```bash
-npm run validation -- -1 -3 -7
+npm run validate -- -1 -3 -7
 ```
 
 ## Otherwise
@@ -55,13 +61,13 @@ npm run validation -- -1 -3 -7
 Similarly, assuming options `1`, `3`, and `7`, either
 
 ```bash
-./validation.sh -137
+./validate.sh -137
 ```
 
 Or
 
 ```bash
-./validation.sh -1 -3 -7
+./validate.sh -1 -3 -7
 ```
 
 ## With `.env`
@@ -77,3 +83,5 @@ USERS_EXPORTS_BY_USERS_IMPORTS=false # (5)
 USERS_IMPORTS_BY_USERS=false # (6)
 USERS_EXPORTS_BY_USERS=true # (7)
 ```
+
+[^1]: Refer to [Bash scripts](https://github.com/sequencemedia/crypto#bash-scripts) in the `README` of the GitHub project

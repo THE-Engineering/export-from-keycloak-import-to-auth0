@@ -1,7 +1,7 @@
 import args from './args.mjs'
 
 import {
-  DEFAULT_KEYCLOAK_PATH,
+  DEFAULT_USERS_PATH,
   DEFAULT_USERS_IMPORTS_PATH
 } from './defaults.mjs'
 
@@ -17,8 +17,8 @@ export const DESTINATION = (
     : '.validate/users-imports-by-users.json'
 )
 
-export const KEYCLOAK_PATH = (
-  args.has('KEYCLOAK_PATH')
-    ? args.get('KEYCLOAK_PATH')
-    : DEFAULT_KEYCLOAK_PATH
+export const USERS_PATH = (
+  args.has('USERS_PATH')
+    ? args.get('USERS_PATH')
+    : DEFAULT_USERS_PATH
 )

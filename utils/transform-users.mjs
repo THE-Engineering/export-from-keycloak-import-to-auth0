@@ -1,4 +1,4 @@
-import transformUser from '#utils/transform-user'
+import transformUser from './transform-user.mjs'
 
 function reduceUsers (accumulator, user) {
   const {
@@ -11,6 +11,8 @@ function reduceUsers (accumulator, user) {
   return accumulator
 }
 
-export default function transformUsers (users) {
-  return users.reduce(reduceUsers, [])
+export default function transformUsers (users = []) {
+  return (
+    users.reduce(reduceUsers, [])
+  )
 }
