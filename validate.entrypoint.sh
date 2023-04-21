@@ -76,7 +76,7 @@ then
     echo -e "\033[0;93mUsers\033[0m"
     echo "​"
 
-    echo Exporting users from THE UMS
+    echo Exporting users from Keycloak
 
     users;
 
