@@ -1,133 +1,34 @@
-# Exporting users from Keycloak with `export` or `export-with-file`
+# Exporting users from Keycloak
 
-Keycloak has [documentation on how to export _Realms_](https://www.keycloak.org/server/importExport) which applies to versions 17 - 20
+Refer to [export-users-from-keycloak](https://github.com/THE-Engineering/export-from-keycloak)
 
-This application is for versions 15 or 16
+This application operates on a GitHub repository of Keycloak user JSON files
 
-## Different files
+You will need
 
-Note that this script expects directory paths _not_ file paths
+- A shared secret
 
-### Export with `export`
+The Keycloak user JSON files _must be_ encrypted with a shared secret
 
-This script applies the `-c` flag to execute shell commands from the command line
+They will be decrypted by this application with the same shared secret
 
-With NPM
+You will also need
 
-```bash
-npm run different-files:export -- \
-  --DOCKER_CONTAINER '<DOCKER CONTAINER NAME>' \
-  --DESTINATION '<KEYCLOAK JSON DIRECTORY>'
-```
+- A _GitHub User Name_
+- A _GitHub User Email_
+- A _GitHub User ID_
+- The _GitHub Repository_ where the Keycloak user JSON files are stored
+- A _GitHub Personal Access Token_ to read from that repository
 
-Otherwise
+**Note** that you only need part of the _GitHub Repository_ address after `https://` (and not including it)
 
-```bash
-node ./scripts/different-files/export.mjs \
-  --DOCKER_CONTAINER '<DOCKER CONTAINER NAME>' \
-  --DESTINATION '<KEYCLOAK JSON DIRECTORY>'
-```
+You should create a _fine grained_ Personal Access Token with read and write permissions _only_ for that repository
 
-### Export with `export-with-file`
 
-This script applies the `cp` flag to create a shell script in the container
-
-With NPM
-
-```bash
-npm run different-files:export-with-file -- \
-  --DOCKER_CONTAINER '<DOCKER CONTAINER NAME>' \
-  --DESTINATION '<KEYCLOAK JSON DIRECTORY>'
-```
-
-Otherwise
-
-```bash
-node ./scripts/different-files/export-with-file.mjs \
-  --DOCKER_CONTAINER '<DOCKER CONTAINER NAME>' \
-  --DESTINATION '<KEYCLOAK JSON DIRECTORY>'
-```
-
-## Realm file
-
-Note that this script expects directory paths _not_ file paths
-
-### Export with `export`
-
-With NPM
-
-```bash
-npm run realm-file:export -- \
-  --DOCKER_CONTAINER '<DOCKER CONTAINER NAME>' \
-  --KEYCLOAK_REALM_NAME '<KEYCLOAK REALM NAME>' \
-  --DESTINATION '<KEYCLOAK JSON DIRECTORY>'
-```
-
-Otherwise
-
-```bash
-node ./scripts/realm-file/export.mjs \
-  --DOCKER_CONTAINER '<DOCKER CONTAINER NAME>' \
-  --KEYCLOAK_REALM_NAME '<KEYCLOAK REALM NAME>' \
-  --DESTINATION '<KEYCLOAK JSON DIRECTORY>'
-```
-
-### Export with `export-with-file`
-
-With NPM
-
-```bash
-npm run realm-file:export-with-file -- \
-  --DOCKER_CONTAINER '<DOCKER CONTAINER NAME>' \
-  --KEYCLOAK_REALM_NAME '<KEYCLOAK REALM NAME>' \
-  --DESTINATION '<KEYCLOAK JSON DIRECTORY>'
-```
-
-Otherwise
-
-```bash
-node ./scripts/realm-file/export-with-file.mjs \
-  --DOCKER_CONTAINER '<DOCKER CONTAINER NAME>' \
-  --KEYCLOAK_REALM_NAME '<KEYCLOAK REALM NAME>' \
-  --DESTINATION '<KEYCLOAK JSON DIRECTORY>'
-```
-
-## Same file
-
-Note that this script expects directory paths _not_ file paths
-
-### Export with `export`
-
-With NPM
-
-```bash
-npm run same-file:export -- \
-  --DOCKER_CONTAINER '<DOCKER CONTAINER NAME>' \
-  --DESTINATION '<KEYCLOAK JSON DIRECTORY>'
-```
-
-Otherwise
-
-```bash
-node ./scripts/same-file/export.mjs \
-  --DOCKER_CONTAINER '<DOCKER CONTAINER NAME>' \
-  --DESTINATION '<KEYCLOAK JSON DIRECTORY>'
-```
-
-### Export with `export-with-file`
-
-With NPM
-
-```bash
-npm run same-file:export-with-file -- \
-  --DOCKER_CONTAINER '<DOCKER CONTAINER NAME>' \
-  --DESTINATION '<KEYCLOAK JSON DIRECTORY>'
-```
-
-Otherwise
-
-```bash
-node ./scripts/same-file/export-with-file.mjs \
-  --DOCKER_CONTAINER '<DOCKER CONTAINER NAME>' \
-  --DESTINATION '<KEYCLOAK JSON DIRECTORY>'
+```dotenv
+GIT_USER_NAME='<GITHUB USER NAME>'
+GIT_USER_EMAIL='<GITHUB USER EMAIL>'
+GIT_USER_ID='<GITHUB USER ID>'
+GIT_PERSONAL_ACCESS_TOKEN='<GITHUB PERSONAL ACCESS TOKEN>'
+GIT_REPOSITORY='<GITHUB REPOSITORY>'
 ```
