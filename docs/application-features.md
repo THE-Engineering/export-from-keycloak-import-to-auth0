@@ -1,0 +1,175 @@
+# Application overview
+
+Users are imported into Auth0 in batches of ~ 500KB
+
+Each batch describes ~ 1335 users
+
+_Creating_ a batch of users in Auth0 takes ~ 4 minutes
+
+_Updating_ a batch of users in Auth0 takes ~ 14 minutes
+
+## Starting with `npm start`
+
+Build the image using `Dockerfile`. Refer to [Set-up](application-set-up.md#building-the-docker-image)
+
+- Application starts
+- Exports all users from keycloak and imports them into Auth0
+- Generates validation JSON
+- [Pushes the validation JSON files into GitHub](pushing-validation-json-files-into-github.md)
+- Application stops
+
+By default, import into Auth0 has the `upsert` flag set as `true` so the application can be run _once_ or _more_ but be aware that _creating_ takes much less time in Auth0 than _updating_ so any second or additional run will take longer
+
+## Starting with `npm run validate`
+
+All of the tasks have a step to _generate validation JSON_ which takes a few seconds to compare users according to particular criteria before writing JSON files
+
+Build the image using Dockerfile `validate.Dockerfile`. Refer to [Set-up](application-set-up.md#building-the-validate-docker-image)
+
+With additional configuration the application can [push the validation JSON files into GitHub](pushing-validation-json-files-into-github.md)
+
+## Removing users
+
+You can remove users from Auth0
+
+- `npm run remove-by-users`
+- `npm run remove-by-users-imports`
+- `npm run remove-by-users-exports`
+
+In each case
+
+- You must supply a JSON file _containing the users to remove_
+- The file must be _encrypted_ with a shared secret to be _decrypted_ by the application[^2]
+
+There are tasks for generating these JSON files, too
+
+### `npm run remove-by-users`
+
+#### Generate the _users JSON file_
+
+Users are exported from GitHub
+
+```bash
+npm run users
+```
+
+By default this writes the _users JSON file_ to `./json/users.json`
+
+#### Remove those users
+
+```bash
+npm run remove-by-users
+```
+
+By default this reads the _users JSON file_ from `./json/users.json`
+
+Each user takes ~ 1.75 seconds to remove from Auth0
+
+The _users JSON file_ path can be given with the environment variable `USERS_JSON_FILE`
+
+```bash
+USERS_JSON_FILE="../users.json"
+npm run remove-by-users
+```
+
+Otherwise, with the command line argument `--USERS_JSON_FILE`
+
+```bash
+npm run remove-by-users -- \
+  --USERS_JSON_FILE "../users.json"
+```
+
+### `npm run remove-by-users-imports`
+
+#### Generate the _users JSON file_
+
+Users are exported from GitHub
+
+```bash
+npm run users-imports
+```
+
+By default this writes the _users JSON files_ to _directory_ `.users-imports`
+
+#### Remove those users
+
+```bash
+npm run remove-by-users-imports
+```
+
+By default this reads the _users JSON files_ from _directory_ `.users-imports`
+
+Each user takes ~ 1.75 seconds to remove from Auth0
+
+The _directory_ path can be given with the environment variable `USERS_IMPORTS_PATH`
+
+```bash
+USERS_IMPORTS_PATH="../.users-imports"
+npm run remove-by-users-imports
+```
+
+Otherwise, with the command line argument `--USERS_IMPORTS_PATH`
+
+```bash
+npm run remove-by-users-imports -- \
+  --USERS_IMPORTS_PATH "../.users-imports"
+```
+
+### `npm run remove-by-users-exports`
+
+#### Generate the _users JSON file_
+
+Users are exported from Auth0
+
+```bash
+npm run users-exports
+```
+
+By default this writes the _users JSON file_ to `.users-exports/users.json`
+
+#### Remove those users
+
+```bash
+npm run remove-by-users-exports
+```
+
+By default this reads the _users JSON file_ from `.users-exports/users.json`
+
+Each user takes ~ 1.75 seconds to remove from Auth0
+
+The _users JSON file_ path can be given with the environment variable `USERS_EXPORTS_PATH`
+
+```bash
+USERS_EXPORTS_PATH="../.users-exports/users.json"
+npm run remove-by-users-exports
+```
+
+Otherwise, with the command line argument `--USERS_EXPORTS_PATH`
+
+```bash
+npm run remove-by-users-exports -- \
+  --USERS_EXPORTS_PATH="../.users-exports/users.json"
+```
+
+## Validation
+
+A complement of _validation_ tasks can be run in the development environment or in production
+
+- `npm run validate-users`
+- `npm run validate-users-by-users-imports`
+- `npm run validate-users-by-users-exports`
+- `npm run validate-users-imports-by-users`
+- `npm run validate-users-imports-by-users-exports`
+- `npm run validate-users-exports-by-users`
+- `npm run validate-users-exports-by-users-imports`
+
+Any or all of these tasks can be run by building the image [using Dockerfile `validate.Dockerfile`](#starting-with-npm run-validate) and setting the environment variables [documented in **Validation**](validation.md)
+
+## Producing a UTC datetime from a JS `Date`
+
+```javascript
+(new Date('Tuesday, 18 April 2023')) / 1000
+```
+
+[^1]: JS `Date` instances have values in _milliseconds_ so [to produce a UTC datetime you can divide a JS date by 1000 for the same value in _seconds_](#producing-a-utc-datetime-from-a-js-date)
+[^2]: In your _development environment_ you can use any good value for `CRYPTO_KEY`. I used a random 32 character string generated by **LastPass**

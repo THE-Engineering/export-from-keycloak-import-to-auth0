@@ -14,21 +14,22 @@ They will be decrypted by this application with the same shared secret
 
 You will also need
 
-- A _GitHub User Name_
-- A _GitHub User Email_
-- A _GitHub User ID_
-- The _GitHub Repository_ where the Keycloak user JSON files are stored
-- A _GitHub Personal Access Token_ to read from that repository
+- A _Git User Name_
+- A _Git User Email_
+- A _Git User ID_
+- The _Git Repository_ where the Keycloak user JSON files are stored
+- A _Personal Access Token_ to read from that repository
 
-**Note** that you only need part of the _GitHub Repository_ address after `https://` (and not including it)
+**Note** that you only need part of the _Git Repository_ address after `https://` (and not including it)
 
-You should create a _fine grained_ Personal Access Token with read and write permissions _only_ for that repository
+You should create a _fine grained Personal Access Token_ with read and write permissions _only_ for that repository
 
+You should set `.env` environment variables before starting the application. (These values cannot be set at the command line)
 
 ```dotenv
-GIT_USER_NAME='<GITHUB USER NAME>'
-GIT_USER_EMAIL='<GITHUB USER EMAIL>'
-GIT_USER_ID='<GITHUB USER ID>'
-GIT_PERSONAL_ACCESS_TOKEN='<GITHUB PERSONAL ACCESS TOKEN>'
-GIT_REPOSITORY='<GITHUB REPOSITORY>'
+GIT_USER_NAME='<GIT USER NAME>'
+GIT_USER_EMAIL='<GIT USER EMAIL>'
+GIT_USER_ID='<GIT USER ID>'
+GIT_PERSONAL_ACCESS_TOKEN='<PERSONAL ACCESS TOKEN>'
+GIT_REPOSITORY='<GIT REPOSITORY>'
 ```
